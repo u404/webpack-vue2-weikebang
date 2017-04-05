@@ -1,6 +1,5 @@
 import Manage from '../components/Manage';
 //import UserCenter from '../components/UserCenter';
-import SubRoute from '../components/SubRoute';
 
 export default [
     {
@@ -25,18 +24,4 @@ export default [
             },'createclass');
         }
     }
-    // {
-    //     path: '/class',
-    //     component: SubRoute,
-    //     children: [
-    //         {
-    //             path: '/',
-    //             component: ClassDetail
-    //         },
-    //         {
-    //             path: '/list',
-    //             component: ClassList
-    //         }
-    //     ]
-    // }
 ]

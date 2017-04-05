@@ -20,7 +20,6 @@
                 <div class="count">4000点</div>
             </div>
         </section>
-        <date-time-selector />
         <section class="pd-lr-m link-box" href="#">
             <div class="left-box">
                 <i class="icon icon-live"></i>我的直播间
@@ -84,7 +83,7 @@
 
 <script>
     import Page from './Page';
-    import DateTimeSelector from './DateTimeSelector';
+
     export default {
         name: 'Manage',
         data(){
@@ -92,8 +91,7 @@
             }
         },
         components: {
-            Page,
-            DateTimeSelector
+            Page
         }
     }
 

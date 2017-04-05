@@ -10,40 +10,51 @@
 <script>    
     import Page from './Page';
     import DateTimeSelector from './DateTimeSelector';
+    import ImageInput from './ImageInput';
+
+    let formData = {
+        cover: null,
+        name: '',
+        time: null,
+        duration: 0,
+    };
+
     const Step1 = {
         template: `
             <page class="class-create-page step1">
-                <form class="createclass-form">
-                    <section class="class-cover" data-filename="cover">
-                        <div class="setting-tips">
+                <image-input :change="coverInputed">
+                    <div class="class-cover" data-filename="cover" :style="{'background-image': coverImage}">
+                        <div class="setting-tips" v-show="!coverImage">
                             <i class="iconfont icon-camera-fill"></i>
                             <span>设置课程封面</span>
                         </div>
-                    </section>
-                    <section class="form">
-                        <div class="form-item">
-                            <label class="iconfont icon-book-open"></label><input class="input-name" name="name" type="text" placeholder="请输入课程名称（仅限16字）" />
+                    </div>
+                </image-input>
+                
+                <section class="form">
+                    <div class="form-item">
+                        <label class="iconfont icon-book-open"></label><input class="input-name" :value="name" type="text" placeholder="请输入课程名称（仅限16字）" />
+                    </div>
+                    <div class="form-item" @click="dateSelector='date-time-selector'">
+                        <label class="iconfont icon-clock"></label><input class="input-time" :value="time" type="text" placeholder="请设置课程开始时间" readonly />
+                    </div>
+                    <div class="form-item">
+                        <label class="iconfont icon-hourglass"></label>
+                        <div class="select">
+                            <input type="hidden" :value="duration" />
+                            <span class="text placeholder">请选择课程时长</span>
+                            <select>
+                                <option>1小时</option>
+                                <option>1.5小时</option>
+                                <option>2小时</option>
+                                <option>2.5小时</option>
+                                <option>3小时</option>
+                                <option>4小时</option>
+                            </select>
                         </div>
-                        <div class="form-item">
-                            <label class="iconfont icon-clock"></label><input class="input-time" name="time" type="text" placeholder="请设置课程开始时间" readonly />
-                        </div>
-                        <div class="form-item">
-                            <label class="iconfont icon-hourglass"></label>
-                            <div class="select">
-                                <input name="duation" type="hidden" value="" />
-                                <span class="text placeholder">请选择课程时长</span>
-                                <select>
-                                    <option>1小时</option>
-                                    <option>1.5小时</option>
-                                    <option>2小时</option>
-                                    <option>2.5小时</option>
-                                    <option>3小时</option>
-                                    <option>4小时</option>
-                                </select>
-                            </div>
-                        </div>
-                    </section>
-                </form>
+                    </div>
+                </section>
+                <component :is="dateSelector" :default="time" @cancel="dateSelector=''" @change="dateChange" />
                 <template slot="footer">
                     <div class="btn btn-next" @click="$emit('goNext')">下一步</div>
                 </template>
@@ -51,11 +62,44 @@
         `,
         data(){
             return {
-
+                show: false,
+                cover: null,
+                name: '',
+                time: null,
+                duration: 0,
+                dateSelector: '',
+                coverImage: null
             }
         },
+        methods:{
+            dateChange(value){
+                this.time= value;
+                this.dateSelector = '';
+            },
+            coverInputed(data){
+                console.log(data);
+                this.coverImage = 'url('+data.sources[0]+')';
+            }
+        },
+        watch: {
+            cover(value){
+                formData.cover = value; 
+            },
+            name(value){
+                formData.name = value;
+            },
+            time(value){
+                formData.time = value;
+            },
+            duration(value){
+                formData.duration = value;
+            }
+
+        },
         components: {
-            Page
+            Page,
+            DateTimeSelector,
+            ImageInput
         }
     };
 
@@ -172,7 +216,7 @@
 <style>
     .class-create-page .form .form-item input { width: auto; }
 
-    .class-create-page.step1 .class-cover { width: 100%; padding-top: 56.25%; background: center no-repeat; background-size: contain; position: relative; }
+    .class-create-page.step1 .class-cover { width: 100%; padding-top: 56.25%; background: center no-repeat; background-size: 100% 100%; position: relative; }
     .class-create-page.step1 .class-cover .setting-tips { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content:  center; align-items: center; background: rgba(0,0,0,0.5); color: #fff; }
     .class-create-page.step1 .class-cover .setting-tips i { font-size: 3.2rem; }
     .class-create-page.step1 .class-cover .setting-tips span { font-size: 1.2rem; }
