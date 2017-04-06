@@ -23,5 +23,13 @@ export default [
                 resolve(require('../components/CreateClass'))
             },'createclass');
         }
+    },
+    {
+        path: '/test',
+        component: resolve => {     
+            require.ensure([], () => {  //webpack特殊形式，可以指定chunk的name
+                resolve(require('../components/Test'))
+            },'test');
+        }
     }
 ]
