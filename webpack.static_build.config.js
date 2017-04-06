@@ -3,27 +3,30 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var path = require('path');
 
-
+//运行时
 module.exports = {
     entry: __dirname + '/src/main.js',
     output: {
-        path: __dirname + '/build',
+        path: __dirname + '/static_build',
         filename: '[name].js',
         chunkFilename: '[name].js',
-        //publicPath: './'
-    },
-    devtool: 'eval-source-map',
-    devServer: {
-        contentBase: './build',
-        port: 8080,
-        inline: true,
-        historyApiFallback: true,
+        publicPath: './'
     },
     plugins: [
         new HtmlWebpackPlugin({
             template: __dirname + '/src/index.template.html'
         }),
-        new ExtractTextPlugin('css/[name].css?[contenthash]'),
+        new ExtractTextPlugin('[name].css?[contenthash]'),      //静态页测试配置
+        new webpack.DefinePlugin({
+            'process.env': {
+                NODE_ENV: '"production"'
+            }
+        }),
+        new webpack.optimize.UglifyJsPlugin({
+            compress: {
+                warnings: false
+            }
+        })
     ],
     module: {
         loaders: [
