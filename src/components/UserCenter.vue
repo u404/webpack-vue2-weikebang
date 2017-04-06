@@ -25,7 +25,7 @@
             </a>
         </div>
         <template slot="footer">
-            <router-link class="btn bd-l" to="/">管理中心</router-link>
+            <router-link class="btn bd-l" to="/" replace>管理中心</router-link>
         </template>
     </page>
 </template>

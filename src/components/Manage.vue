@@ -76,7 +76,7 @@
         </section>
         <template slot="footer">
             <router-link class="btn" to="/class/create">创建课程</router-link>
-            <router-link class="btn bd-l" to="/user/">个人中心</router-link>
+            <router-link class="btn bd-l" to="/user/" replace>个人中心</router-link>
         </template>
     </page>
 </template>

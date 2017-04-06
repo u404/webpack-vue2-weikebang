@@ -1,8 +1,10 @@
 <template>
     <page>
         <transition :name="transitionName" mode="in-out">
-            <step1 v-if="!isStep2" @goNext="toggleStep"></step1>
-            <step2 v-else @goPrev="toggleStep"></step2>
+            <keep-alive>
+                <step1 v-if="!isStep2" @goNext="toggleStep"></step1>
+                <step2 v-else @goPrev="toggleStep" @create="tryCreate"></step2>
+            </keep-alive>
         </transition>      
     </page>
 </template>
@@ -10,6 +12,7 @@
 <script>    
     import Page from './Page';
     import DateTimeSelector from './DateTimeSelector';
+    import NormalSelector from './NormalSelector';
     import ImageInput from './ImageInput';
 
     let formData = {
@@ -17,6 +20,15 @@
         name: '',
         time: null,
         duration: 0,
+        classtype: 0,
+        needSignInfo: false,
+        needVerfy: false,
+        customKeyA: '',
+        customKeyB: '',
+        customKeyC: '',
+        customKeyD: '',
+        price: 0,
+        password: ''
     };
 
     const Step1 = {
@@ -33,28 +45,20 @@
                 
                 <section class="form">
                     <div class="form-item">
-                        <label class="iconfont icon-book-open"></label><input class="input-name" :value="name" type="text" placeholder="请输入课程名称（仅限16字）" />
+                        <label class="iconfont icon-book-open"></label>
+                        <input :value="name" type="text" placeholder="请输入课程名称（仅限16字）" />
                     </div>
                     <div class="form-item" @click="dateSelector='date-time-selector'">
-                        <label class="iconfont icon-clock"></label><input class="input-time" :value="time" type="text" placeholder="请设置课程开始时间" readonly />
+                        <label class="iconfont icon-clock"></label>
+                        <input :value="time" type="text" placeholder="请设置课程开始时间" readonly />
                     </div>
-                    <div class="form-item">
+                    <div class="form-item" @click="durationSelector='normal-selector'">
                         <label class="iconfont icon-hourglass"></label>
-                        <div class="select">
-                            <input type="hidden" :value="duration" />
-                            <span class="text placeholder">请选择课程时长</span>
-                            <select>
-                                <option>1小时</option>
-                                <option>1.5小时</option>
-                                <option>2小时</option>
-                                <option>2.5小时</option>
-                                <option>3小时</option>
-                                <option>4小时</option>
-                            </select>
-                        </div>
+                        <input :value="durationText" type="text" placeholder="请选择课程时长" readonly />
                     </div>
                 </section>
                 <component :is="dateSelector" :default="time" @cancel="dateSelector=''" @change="dateChange" />
+                <component :is="durationSelector" :default="duration" :datalist="durationItemList" @cancel="durationSelector=''" @change="durationChange"></component>
                 <template slot="footer">
                     <div class="btn btn-next" @click="$emit('goNext')">下一步</div>
                 </template>
@@ -67,14 +71,29 @@
                 name: '',
                 time: null,
                 duration: 0,
+                durationText: '',
                 dateSelector: '',
-                coverImage: null
+                durationSelector: '',
+                coverImage: null,
+                durationItemList: [
+                    { value: 60, text: '1小时' },
+                    { value: 90, text: '1.5小时' },
+                    { value: 120, text: '2小时' },
+                    { value: 150, text: '2.5小时' },
+                    { value: 180, text: '3小时' },
+                    { value: 240, text: '4小时' },                    
+                ]
             }
         },
         methods:{
             dateChange(value){
                 this.time= value;
                 this.dateSelector = '';
+            },
+            durationChange(data){
+                this.duration = data.value;
+                this.durationText = data.text;
+                this.durationSelector = '';
             },
             coverInputed(data){
                 console.log(data);
@@ -99,92 +118,174 @@
         components: {
             Page,
             DateTimeSelector,
+            NormalSelector,
             ImageInput
+        },
+        created(){
+            formData.cover = this.cover;
+            formData.name = this.name;
+            formData.time = this.time;
+            formData.duration = this.duration;
         }
     };
 
     const Step2 = {
         template: `
             <page class="class-create-page step2">
-                <input class="input-type" type="hidden" name="classtype" value="" />
                 <div class="tabs-classtype">
-                    <div class="tab active" data-value="0">
+                    <div :class="{'active': classtype===0}" class="tab" @click="classtype=0">
                         <i class="icon icon-free"></i>
                         <span class="text">免费课程</span>
                     </div>
-                    <div class="tab" data-value="1">
+                    <div :class="{'active': classtype===1}" class="tab" @click="classtype=1">
                         <i class="icon icon-fee"></i>
                         <span class="text">收费课程</span>
                     </div>
-                    <div class="tab" data-value="2">
+                    <div :class="{'active': classtype===2}" class="tab" @click="classtype=2">
                         <i class="icon icon-lock"></i>
                         <span class="text">加密课程</span>
                     </div>
                 </div>
-                <div class="tabcontent-list">
-                    <section class="tabcontent">
+                <div>
+                    <section v-show="classtype===0">
                         <div class="classtype-form classtype-freeinfo-form">
                             <div class="desc">学员无需交费即可进入课程</div>
                         </div>
                     </section>
-                    <section class="tabcontent">
+                    <section v-show="classtype===1">
                         <div class="classtype-form classtype-chargeinfo-form">
                             <div class="desc">学员需交费后进入课程</div>
-                            <input type="number" pattern="[\.0-9]*" placeholder="请设置收费金额" />
+                            <input type="number" pattern="[\.0-9]*" placeholder="请设置收费金额" v-model:value="price" />
                         </div>
                     </section>
-                    <section class="tabcontent">
+                    <section v-show="classtype===2">
                         <div class="classtype-form classtype-encryptedinfo-form">
                             <div class="desc">学员需输入密码后进入课程</div>
-                            <input type="password" placeholder="请输入课程密码" />
+                            <input type="password" placeholder="请输入课程密码" v-model:value="password" />
                         </div>
                     </section>
                 </div>
-                <section class="form pd-lr-m bd-t mg-t-s sign-form">
+                <section :class="{active: needSignInfo}" class="form pd-lr-m bd-t mg-t-s sign-form">
                     <div class="form-item">
                         <label>学生报名时需填写信息</label>
                         <div>
-                            <span class="switch switch-signform"><input type="hidden" value="false" /> </span>
+                            <span :class="{'active': needSignInfo}" class="switch" @click="needSignInfo=!needSignInfo"></span>
                         </div>
                     </div>
                     <div class="form-item bd-none">
-                        <input type="text" name="customKeyA" value="姓名" />
-                        <span class="checkbox active mg-l-s disabled" data-init-control="initCheckbox"><input type="hidden" value="" /></span>
+                        <input type="text" v-model:value="customKeyA" readonly />
+                        <span class="checkbox active mg-l-s"></span>
                     </div>
                     <div class="form-item bd-none">
-                        <input type="text" name="customKeyB" value="电话" />
-                        <span class="checkbox active mg-l-s" data-init-control="initCheckbox"><input type="hidden" value="" /></span>
+                        <input type="text" v-model:value="customKeyB" readonly />
+                        <span :class="{active: includeCustomKeyB}" class="checkbox mg-l-s" @click="includeCustomKeyB=!includeCustomKeyB"></span>
                     </div>
-                    <!--<div class="form-item bd-none">-->
-                        <!--<input type="text" name="customKeyC" placeholder="报名的信息（例如QQ）" value="" />-->
-                        <!--<span class="btn-remove mg-l-s mg-r-s"></span>-->
-                        <!--&lt;!&ndash;<span class="checkbox active mg-l-s" data-init-control="initCheckbox">必填<input type="hidden" value="" /></span>&ndash;&gt;-->
-                    <!--</div>-->
-                    <!--<div class="form-item bd-none">-->
-                        <!--<input type="text" name="customKeyD" placeholder="报名的信息（例如职位）" value="" />-->
-                        <!--<span class="btn-remove mg-l-s mg-r-s"></span>-->
-                        <!--&lt;!&ndash;<span class="checkbox mg-l-s" data-init-control="initCheckbox">必填<input type="hidden" value="" /></span>&ndash;&gt;-->
-                    <!--</div>-->
-                    <div class="form-item bd-none pd-t-m">
-                        <button class="cbtn btn-main btn-normal-green btn-additem"><i class="iconfont icon-plus"></i> 新增信息项目</button>
+                    <div class="form-item bd-none" v-show="showCustomKeyC">
+                        <input type="text" placeholder="报名的信息（例如QQ）" v-bind:value="customKeyC" />
+                        <span class="btn-remove mg-l-s mg-r-s" @click="showCustomKeyC=false"></span>
+                        <span :class="{active:requireCustomKeyC}" class="checkbox mg-l-s" @click="requireCustomKeyC=!requireCustomKeyC">必填</span>
+                    </div>
+                    <div class="form-item bd-none" v-show="showCustomKeyD">
+                        <input type="text" placeholder="报名的信息（例如职位）" v-bind:value="customKeyD" />
+                        <span class="btn-remove mg-l-s mg-r-s" @click="showCustomKeyD=false"></span>
+                        <span :class="{active:requireCustomKeyD}" class="checkbox mg-l-s" @click="requireCustomKeyD=!requireCustomKeyD">必填</span>
+                    </div>
+                    <div class="form-item bd-none pd-t-m" v-show="!showCustomKeyC || !showCustomKeyD">
+                        <button class="cbtn btn-main btn-normal-green btn-additem" @click="appendCustomKey"><i class="iconfont icon-plus"></i> 新增信息项目</button>
                     </div>
                     <div class="form-item">
-                        <span class="radio" data-init-control="initCheckbox">开启审核<input type="hidden" value="" /></span>
+                        <span :class="{active: needVerfy}" class="radio" @click="needVerfy=!needVerfy">开启审核</span>
                     </div>
                 </section>
                 <template slot="footer">
                     <div class="btn btn-normal btn-prev" @click="$emit('goPrev')">上一步</div>
-                    <div class="btn btn-create">创建</div>
+                    <div class="btn btn-create" @click="$emit('create')">创建</div>
                 </template>
             </page>
         `,
         data(){
             return {
-
+                classtype: 0,
+                needSignInfo: false,
+                customKeyA: '姓名',
+                customKeyB: '电话',
+                customKeyC: '',
+                customKeyD: '',
+                includeCustomKeyB: true,
+                showCustomKeyC: false,
+                showCustomKeyD: false,
+                needVerfy: false,
+                requireCustomKeyC: true,
+                requireCustomKeyD: true,
+                price: 0,
+                password: ''
             }
+        },
+        methods:{
+            appendCustomKey(){
+                if(!this.showCustomKeyC){
+                    this.showCustomKeyC = true;
+                }
+                else{
+                    this.showCustomKeyD = true;
+                }
+            }
+        },
+        watch:{
+            includeCustomKeyB(newValue){
+                if(newValue){
+                    formData.customKeyB = this.customKeyB;
+                }
+                else{
+                    formData.customKeyB = '';
+                }
+            },
+            showCustomKeyC(newValue){
+                if(!newValue){
+                    this.customKeyC = '';
+                }
+            },
+            showCustomKeyD(newValue){
+                if(!newValue){
+                    this.customKeyD = '';
+                }
+            },
+            classtype(value){
+                formData.classtype = value;
+            },
+            needSignInfo(value){
+                formData.needSignInfo = value;
+            },
+            needVerfy(value){
+                formData.needVerfy = value;
+            },
+            customKeyC(value){
+                formData.customKeyC = value;
+            },
+            customKeyD(value){
+                formData.customKeyC = value;
+            },
+            price(value){
+                formData.price = value;
+            },
+            password(value){
+                formData.password = value;
+            }
+            
         },
         components: {
             Page
+        },
+        created(){
+            formData.classtype = this.classtype;
+            formData.customKeyA = this.customKeyA;
+            formData.customKeyB = this.customKeyB;
+            formData.customKeyC = this.customKeyC;
+            formData.customKeyD = this.customKeyD;
+            formData.needSignInfo = this.needSignInfo;
+            formData.needVerfy = this.needVerfy;       
+            formData.password = this.password;
+            formData.price = this.price;   
         }
     };
 
@@ -198,6 +299,9 @@
         methods: {
             toggleStep(){
                 this.isStep2 = !this.isStep2;
+            },
+            tryCreate(){
+                
             }
         },
         computed: {
@@ -253,4 +357,5 @@
     .class-create-page .sign-form .form-item { position: relative; }
     .class-create-page .sign-form .form-item .btn-remove { font-size: 1.6rem; color: #969696; }
     .class-create-page .sign-form .form-item .btn-remove:before { font-family: iconfont; content: "\e618"; }
+
 </style>
