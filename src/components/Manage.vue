@@ -20,22 +20,22 @@
                 <div class="count">4000点</div>
             </div>
         </section>
-        <section class="pd-lr-m link-box" href="#">
+        <router-link class="section pd-lr-m link-box" to="live">
             <div class="left-box">
                 <i class="icon icon-live"></i>我的直播间
             </div>
-            <a class="right-box link" href="#">
+            <div class="right-box link">
                 满视觉大盛大发售
-            </a>
-        </section>
-        <section class="pd-lr-m link-box" href="#">
+            </div>
+        </router-link>
+        <router-link class="section pd-lr-m link-box" to="class/manage">
             <div class="left-box">
                 <i class="icon icon-book"></i>我的课程
             </div>
-            <a class="right-box link" href="#">
+            <div class="right-box link">
                 5个
-            </a>
-        </section>
+            </div>
+        </router-link>
         <section class="link-list mg-t-s">
             <a class="link" href="#">
                 <i class="icon icon-1"></i>

@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import App from './App';
 import _ from 'lodash';
+import './utils/lib';
 import './assets/css';
+import FastClick from 'fastclick';
 
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
@@ -12,6 +14,8 @@ const router = new VueRouter({
     base: __dirname,
     routes
 });
+
+FastClick.attach(document.body);
 
 var vm = new Vue({
     el: '#app',

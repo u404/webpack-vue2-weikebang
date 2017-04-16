@@ -25,6 +25,26 @@ export default [
         }
     },
     {
+        path: '/class/manage',
+        component: resolve =>{
+            require.ensure([],()=>{
+                resolve(require('../components/ClassManage'))
+            },'classmanage');
+        }
+    },
+    {
+        path: '/live/:id?',
+        component: resolve =>{
+            require.ensure([],()=>{
+                resolve(require('../components/LiveIndex'))
+            },'live');
+        }
+    },
+    {
+        path: '/class/:id',
+        component: null
+    },
+    {
         path: '/test',
         component: resolve => {     
             require.ensure([], () => {  //webpack特殊形式，可以指定chunk的name
