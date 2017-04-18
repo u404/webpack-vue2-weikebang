@@ -1,11 +1,11 @@
 <template>
-    <bottom-menu class="normalselector" @maskclick="cancelSelect">
+    <bottom-menu class="normalselector" @maskclick="cancelSelect" v-show="show">
         <div class="normalselector-body">
             <div class="normalselector-btnbar">
                 <span class="btn btn-cancel" @click="cancelSelect">取消</span>
                 <span class="btn btn-sure" @click="sureSelect">确认</span>
             </div>
-            <selector :default="this.default" :datalist="datalist" @change="change"></selector>
+            <selector :show="show" :default="this.default" :datalist="datalist" @change="change"></selector>
         </div>
     </bottom-menu>
 </template>
@@ -16,6 +16,10 @@
     export default {
         name: 'NormalSelector',
         props:{
+            show: {
+                type: Boolean,
+                default: false
+            },
             default: {
                 default: ''
             },

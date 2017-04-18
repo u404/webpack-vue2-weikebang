@@ -1,5 +1,5 @@
 <template>
-    <bottom-menu class="datetimeselector" @maskclick="cancelSelect">
+    <bottom-menu class="datetimeselector" @maskclick="cancelSelect" v-show="show">
         <div class="datetimeselector-body">
             <div class="datetimeselector-btnbar">
                 <span class="btn btn-cancel" @click="cancelSelect">取消</span>
@@ -23,25 +23,25 @@
             <ul class="datetimeselector-list">
                 <template v-if="showDate">
                     <li class="selector-year">
-                        <selector :default="year" :datalist="yearList" @change="yearChange"></selector>
+                        <selector :show="show" :default="year" :datalist="yearList" @change="yearChange"></selector>
                     </li>
                     <li class="selector-month">
-                        <selector :default="month" :datalist="monthList" @change="monthChange"></selector>
+                        <selector :show="show" :default="month" :datalist="monthList" @change="monthChange"></selector>
                     </li>
                     <li class="selector-day">
-                        <selector :default="day" :datalist="dayList" @change="dayChange"></selector>
+                        <selector :show="show" :default="day" :datalist="dayList" @change="dayChange"></selector>
                     </li>
                 </template>
                 
                 <template v-if="showTime">
                     <li class="selector-hour">
-                        <selector :default="hour" :datalist="hourList" @change="hourChange"></selector>
+                        <selector :show="show" :default="hour" :datalist="hourList" @change="hourChange"></selector>
                     </li>
                     <li class="selector-min">
-                        <selector :default="min" :datalist="minList" @change="minChange"></selector>
+                        <selector :show="show" :default="min" :datalist="minList" @change="minChange"></selector>
                     </li>
                     <li v-if="showSec" class="selector-sec">
-                        <selector :default="sec" :datalist="secList" @change="secChange"></selector>
+                        <selector :show="show" :default="sec" :datalist="secList" @change="secChange"></selector>
                     </li>
                 </template>
             </ul>
@@ -55,6 +55,10 @@
     export default {
         name: 'DateTimeSelector',
         props:{
+            show: {
+                type: Boolean,
+                default: false
+            },
             default: {
                 default(){
                     return new Date();
@@ -83,12 +87,12 @@
         },
         data(){
             return {
-                year: 0,
-                month: 0,
-                day: 0,
-                hour: 0,
-                min: 0,
-                sec: 0,
+                year: null,
+                month: null,
+                day: null,
+                hour: null,
+                min: null,
+                sec: null,
                 yearList:[],
                 monthList: [],
                 dayList:[],
@@ -218,6 +222,9 @@
             }
         },
         watch: {
+            show(){
+                this._setValueByDefault();
+            },
             default(newValue){
                 this._setValueByDefault();
             },
@@ -225,7 +232,7 @@
                 this.updateDayList();
             }
         },
-        beforeMount () {
+        mounted () {
             this._setValueByDefault();
             if(this.showDate){
                 this.updateYearList();
@@ -247,7 +254,7 @@
     }
 </script>
 
-<style>
+<style scoped>
     .datetimeselector { color: #666; }
     .datetimeselector-btnbar { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; }
     .datetimeselector-btnbar .btn { flex: 1; height: 30px; line-height: 30px; border: 0 none;  }

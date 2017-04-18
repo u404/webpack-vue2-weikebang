@@ -1,6 +1,6 @@
 <template>
     <page class="class-detail-page">
-        <header class="header-info-box" style="background-image: url(http://open.weikebang.com/Content/images/imgs/app_banner.png);">
+        <header class="header-info-box" style="background-image: url(/css/images/1.jpg);">
             <a class="link link-back" href="#"><span class="iconfont icon-arrowleft"></span></a>
             <a class="link link-share" href="#"><span class="iconfont icon-share"></span></a>
             <span class="link link-changebg">更换背景</span>
@@ -10,12 +10,11 @@
                 <h1 class="class-title">如何在工作生活当中培养习惯？</h1>
                 <div class="class-live-info flex-l">
                     <div class="class-live-from fc-bw1">来自 <span class="class-livename fc-green">大家来冒险</span></div>
-                    <div class="cbtn btn-class-fav mg-l-s">+关注</div>
-                    <div class="cbtn btn-class-fav mg-l-s state-faved">已关注</div>
+                    <div class="cbtn btn-class-fav mg-l-s" :class="{'state-faved':faved}" @click="faved=!faved">{{faved?'已关注':'+关注'}}</div>
                 </div>
             </div>
             <div class="row flex-lr">
-                <div class="class-hot-count">2888</div>
+                <div class="class-hot-count">{{views}}</div>
             </div>
             <div class="row flex-lr">
                 <div class="class-time">04.01(周二)17:30</div>
@@ -111,3 +110,72 @@
         </template>
     </page>
 </template>
+
+<script>
+    import Page from './Page';
+
+    export default {
+        data(){
+            return {
+                faved: false,
+                views: 2888,
+                
+            }
+        },
+        components: {
+            Page
+        }
+    }
+</script>
+
+<style>
+    .class-detail-page {  }
+    .class-detail-page .header-info-box {
+        position: relative;
+        height: 56.25vw;
+        padding: 1.6rem;
+        background: center no-repeat; background-size: cover;
+        color: #fff;
+        text-align: center;
+    }
+    .class-detail-page .header-info-box .link-back { position: absolute; left: 1.6rem; font-size: 2.3rem; }
+    .class-detail-page .header-info-box .link-share { position: absolute; right: 1.6rem; font-size: 2.3rem;  }
+    .class-detail-page .header-info-box .link-changebg { position: absolute; bottom: 0.8rem; right: 0; width: 6.5rem; height: 2.2rem; line-height: 2.2rem; background: rgba(0,0,0,0.5); border-radius: 1.1rem 0 0 1.1rem; font-size: 1.2rem; color: #fff; }
+
+    .class-detail-page .row { min-height: 4.4rem; padding: 0.8rem 0; border-bottom: 1px solid #e6e6e6; }
+    .class-detail-page .row:last-child,
+    .class-detail-page .row.bd-none { border-bottom: none; }
+    .class-detail-page .flex { display: flex; align-items: center; }
+    .class-detail-page .flex-l { display: flex; justify-content: flex-start; align-items: center; }
+    .class-detail-page .flex-r { display: flex; justify-content: flex-end; align-items: center; }
+    .class-detail-page .flex-lr { display: flex; justify-content: space-between; align-items: center; }
+    .class-detail-page .classinfo-box .class-title { font-size: 1.6rem; font-weight: normal; line-height: 1.8; }
+    .class-detail-page .class-live-info { line-height: 1.8; }
+    .class-detail-page .btn-class-fav { width: 5rem; text-align: center; border: 1px solid transparent; }
+    .class-detail-page .btn-class-fav:not(.state-faved) { border: 1px solid #59b574; color: #59b574; border-radius: 0.2rem; }
+    .class-detail-page .btn-class-fav.state-faved { color: #969696; }
+    .class-detail-page .class-hot-count {  }
+    .class-detail-page .class-hot-count:before { font-family: iconfont; color: #59b574; content: "\e601"; margin-right: 1rem; font-size: 1.6rem; vertical-align: middle; }
+    .class-detail-page .class-time {  }
+    .class-detail-page .class-time:before { font-family: iconfont; color: #59b574; content: "\e600"; margin-right: 1rem; font-size: 1.6rem; vertical-align: middle; }
+    .class-detail-page .class-price {  }
+    .class-detail-page .class-price:before { font-family: iconfont; color: #59b574; content: "\e607"; margin-right: 1rem; font-size: 1.6rem; vertical-align: middle; }
+    .class-detail-page .user-icon { width: 3rem; height: 3rem; margin-right: 0.8rem; }
+    .class-detail-page .student-count { margin-right: 0.8rem; }
+    .class-detail-page .countdown-box { height: 6.5rem; }
+    .class-detail-page .countdown-box .countdown { margin-left: 2.0rem; }
+    .class-detail-page .teacher-box .teacher-name {  }
+    .class-detail-page .teacher-box .teacher-role { margin-left: 0.5em; }
+    .class-detail-page .teacher-box .teacher-desc { padding-bottom: 0.8rem; }
+    .class-detail-page .classdesc-box .class-desc { padding-bottom: 1.6rem; }
+
+    .class-detail-page .qrcode { margin-top: 2.5rem; text-align: center; }
+    .class-detail-page .qrcode img { width: 15rem; height: 15rem; }
+    .class-detail-page .qrcode figcaption { color: #969696; font-size: 1.2rem; }
+    .class-detail-page .weikebang-support { margin: 2.5rem 0; text-align: center; }
+    .class-detail-page .weikebang-support .logo { display: block; margin: 0 auto; }
+    .class-detail-page .weikebang-support .text { display: block; color: #969696; font-size: 0.9rem; }
+
+    .class-detail-page .iconfont { font-size: 1.6rem; vertical-align: middle; }
+    .class-detail-page .row .icon-arrowright { font-size: inherit; }
+</style>

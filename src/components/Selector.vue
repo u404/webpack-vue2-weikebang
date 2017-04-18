@@ -1,17 +1,20 @@
 <template>
     <div class="selector">
-        <ul class="selector-list">
+        <ul ref="list" class="selector-list">
             <li class="selector-item" v-for="item of datalist" :data-value="item[valueField]">{{item[textField]}}</li>
         </ul>
         <div class="selector-frontsight"></div>
     </div>
-    
 </template>
 
 <script>
     import Hammer from 'hammerjs';
     export default {
         props: {
+            show: {
+                type: Boolean,
+                default: false
+            },
             default: {
                 default: null,
             },
@@ -31,12 +34,14 @@
         data(){
             return {
                 listEl: null,
+                itemEls: null,
                 enabledTransition: true,
                 itemHeight: 0,
                 userScrolling: false,
                 slowdownInterval: null,
                 index: null,
-                value: null
+                value: null,
+                renderFunctionCache: null,
             }
         },
         computed: {
@@ -49,50 +54,72 @@
                 this.updateTransform(-index*this.itemHeight);
             },
             updateIndexByTranslate(translate){
-                this.index = Math.abs(Math.round(-translate/this.itemHeight));
+                var index = Math.round(-translate/this.itemHeight);
+                if(index<0){
+                    index = 0;
+                }
+                else if(index > this.datalist.length - 1){
+                    index = this.datalist.length - 1;
+                }
+                this.index = index;
             },
             updateTransform(translate){
                 this.listEl.style.transform = 'translateY('+translate+'px)';
-            },
-            initDomData(){
-                this.listEl = this.$el.querySelector('.selector-list');
-                this.itemHeight = this.listEl.querySelector('.selector-item').offsetHeight;
             }
         },
         watch: {
-            datalist(newDataList){
-                if(this.default){
-                    this.index = this.datalist.findIndex(o=>o.value==this.default);
+            show(value){
+                if(value){
+                    this.itemHeight = this.listEl.querySelector('.selector-item').offsetHeight;
+                    this.renderFunctionCache && this.renderFunctionCache();
+                    this.renderFunctionCache = null;
                 }
                 else{
-                    this.index = 0;
+                    this.slowdownInterval && clearInterval(this.slowdownInterval);
+                    this.enabledTransition = true;
+                    this.updateTransformByIndex(this.index);
+                    this.userScrolling = false;
                 }
-            },
-            index(newIndex, oldIndex){
-                let items = this.listEl.querySelectorAll('.selector-item'),
-                    selectedItem = items[newIndex],
-                    oldItem = items[oldIndex];
-                if(!selectedItem){
-                    this.index = 0;
-                    return;
-                }
-                this.value = selectedItem.dataset.value;
-                this.$emit('change',{text: selectedItem.textContent, value: this.value, index: this.index});
-                if(oldItem){
-                    oldItem.className = oldItem.className.replace(/ \bselector-item-active\b/,'');
-                }
-                selectedItem.className = selectedItem.className+ ' selector-item-active';
-                if(!this.userScrolling){
-                    this.updateTransformByIndex(newIndex);
-                }
-            },
-            value(newValue){
-                let items = this.$el.querySelectorAll('.selector-item');
-                this.index = Array.prototype.findIndex.call(items,item=>item.dataset.value==newValue);
             },
             default(){
-                //this.slowdownInterval && clearInterval(this.slowdownInterval);
                 this.value = this.default;
+            },
+            datalist(newDataList){
+                if(!this.default || (this.index = this.datalist.findIndex(o=>o.value==this.default))<0){
+                    this.index = 0;
+                }
+                this.itemEls = null;
+                this.$nextTick(()=>{
+                    this.itemEls = this.listEl.querySelectorAll('.selector-item');
+                    if(this.show){
+                        this.renderFunctionCache && this.renderFunctionCache();
+                        this.renderFunctionCache = null;
+                    }
+                });
+                
+            },
+            value(newValue){
+                this.index = this.datalist.findIndex(item=>item[this.valueField]==newValue);
+            },
+            index(newIndex, oldIndex){
+                this.value = this.datalist[newIndex][this.valueField];
+                this.$emit('change',{text: this.datalist[newIndex][this.textField], value: this.value, index: this.index});
+                this.renderFunctionCache = ()=>{
+                    let selectedItem = this.itemEls[newIndex],
+                        oldItem = this.itemEls[oldIndex];
+                    if(oldItem){
+                        oldItem.className = oldItem.className.replace(/ \bselector-item-active\b/,'');
+                    }
+                    selectedItem.className = selectedItem.className+ ' selector-item-active';
+                    if(!this.userScrolling){
+                        this.updateTransformByIndex(newIndex);
+                    }
+                };
+
+                if(this.show && this.itemEls){
+                    this.renderFunctionCache();
+                    this.renderFunctionCache = null;
+                }
             },
             enabledTransition(value){
                 if(value){
@@ -106,12 +133,12 @@
             }
         },
         mounted () {
+            this.listEl = this.$refs.list;
+            this.itemEls = this.listEl.querySelectorAll('.selector-item');
 
             let mc = new Hammer(this.$el),
                 startY = 0,
                 translatedY = 0;
-
-            this.initDomData();
 
             mc.get('pan').set({ direction: Hammer.DIRECTION_VERTICAL });
             // listen to events...
@@ -143,16 +170,13 @@
                 this.slowdownInterval = setInterval(()=>{
                     if(translateY>0){
                         translateY = 0;
-                        console.log(1);
                         _end();
                     }
                     else if(translateY < this.limitTransform){
                         translateY = this.limitTransform;
-                        console.log(2);
                         _end();
                     }
                     else if((a>0 && speed<=0) || (a<0 && speed>=0)){
-                        console.log(3);
                         _end();
                     }
                     else{
@@ -163,12 +187,6 @@
                     }
                 },1);
             });
-            if(this.default){
-                this.value = this.default;
-            }
-            else{
-                this.index = 0;
-            }
         }
     }
 </script>

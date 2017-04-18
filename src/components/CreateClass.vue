@@ -48,17 +48,17 @@
                         <label class="iconfont icon-book-open"></label>
                         <input :value="name" type="text" placeholder="请输入课程名称（仅限16字）" />
                     </div>
-                    <div class="form-item" @click="dateSelector='date-time-selector'">
+                    <div class="form-item" @click="dateSelectorShow=true">
                         <label class="iconfont icon-clock"></label>
                         <input :value="time" type="text" placeholder="请设置课程开始时间" readonly />
                     </div>
-                    <div class="form-item" @click="durationSelector='normal-selector'">
+                    <div class="form-item" @click="durationSelectorShow=true">
                         <label class="iconfont icon-hourglass"></label>
                         <input :value="durationText" type="text" placeholder="请选择课程时长" readonly />
                     </div>
                 </section>
-                <component :is="dateSelector" :default="time" @cancel="dateSelector=''" @change="dateChange" />
-                <component :is="durationSelector" :default="duration" :datalist="durationItemList" @cancel="durationSelector=''" @change="durationChange"></component>
+                <date-time-selector :show="dateSelectorShow" :default="time" @cancel="dateSelectorShow=false" @change="dateChange"/>
+                <normal-selector :show="durationSelectorShow" :default="duration" :datalist="durationItemList" @cancel="durationSelectorShow=false" @change="durationChange"/>
                 <template slot="footer">
                     <div class="btn btn-next" @click="$emit('goNext')">下一步</div>
                 </template>
@@ -72,8 +72,8 @@
                 time: null,
                 duration: 0,
                 durationText: '',
-                dateSelector: '',
-                durationSelector: '',
+                dateSelectorShow: false,
+                durationSelectorShow: false,
                 coverImage: null,
                 durationItemList: [
                     { value: 60, text: '1小时' },
@@ -88,12 +88,12 @@
         methods:{
             dateChange(value){
                 this.time= value;
-                this.dateSelector = '';
+                this.dateSelectorShow = false;
             },
             durationChange(data){
                 this.duration = data.value;
                 this.durationText = data.text;
-                this.durationSelector = '';
+                this.durationSelectorShow = false;
             },
             coverInputed(data){
                 console.log(data);

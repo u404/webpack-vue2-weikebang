@@ -1280,23 +1280,7 @@ body {
     background: none center no-repeat;
     background-size: cover;
     border-radius: 50%;
-}
-
-.live-common .class-list {  }
-.live-common .class-list>* { border-bottom: 1px solid #e6e6e6; }
-.live-common .class-list .class-item { display: -webkit-box; display: -ms-flexbox; display: flex; -webkit-box-pack: start; -ms-flex-pack: start; justify-content: flex-start; padding: 1.6rem; background: #fff; -webkit-box-flex: 0; -ms-flex: 0 0 auto; flex: 0 0 auto; width: 100%; }
-.live-common .class-list .class-item .class-img { -webkit-box-flex: 0; -ms-flex: 0 0 auto; flex: 0 0 auto; width: 12.8rem; height: 7.2rem; background: center no-repeat; background-size: cover; }
-.live-common .class-list .class-item .class-info { -webkit-box-flex: 1; -ms-flex: 1 1 auto; flex: 1 1 auto; margin-left: 0.8rem; width: 100%; position: relative; }
-.live-common .class-list .class-item .class-title { word-break: break-all; max-height: 3em; overflow: hidden; }
-.live-common .class-list .class-item .class-hot { font-size: 1.2rem; }
-.live-common .class-list .class-item .class-hot:before { margin-right: 0.4rem; font-family: iconfont; content: "\E601"; }
-.live-common .class-list .class-item .class-time { position: absolute; bottom: 0; height: 1.6rem; line-height: 1.6rem; padding: 0 0.4rem; border: 1px solid #e6e6e6; color: #969696; border-radius: 0.2rem; }
-
-.live-common .class-list .class-item .class-time.state-active { border: 1px solid #59b574; color: #59b574; }
-
-.live-common .class-list .class-item.state-hidden {  }
-.live-common .class-list .class-item.state-hidden .class-info .class-time { display: none; }
-.live-common .class-list .class-item.state-hidden .class-info:after { position: absolute; bottom: 0; height: 1.6rem; line-height: 1.6rem; padding: 0 0.4rem; border: 1px solid #f00; color: #f00; border-radius: 0.2rem; content: "\3B4\579\2BE"; }.user-icon {
+}.user-icon {
     display: inline-block;
     width: 4rem;
     height: 4rem;

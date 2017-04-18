@@ -42,7 +42,11 @@ export default [
     },
     {
         path: '/class/:id',
-        component: null
+        component: resolve =>{
+            require.ensure([],()=>{
+                resolve(require('../components/ClassDetail'))
+            })
+        }
     },
     {
         path: '/test',
